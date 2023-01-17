@@ -15,17 +15,39 @@ struct ContentView: View {
     
     @StateObject var contentViewModel = ContentViewModel()
     
-    @State var chainId: String = "8217"
+    @State var chainId: String = ""
     
     @State var message: String = "favorlet"
     
-    @State var toAddress: String = "0x1707Cc19778A773c45C1EA03f62482481d3c0fBD"
+    @State var toAddress: String = "0x..."
     @State var amount: String = "100000000000000000" // 0.1 KLAY
     
     @State var contractAddress: String = "0xe34acbf6fd2bc844be302e4acc97f401f6cd6985"
-    @State var abi: String = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{}]"
-    @State var params: String = ""
-    @State var functionName: String = "safeTransferFrom"
+    @State var abi: String = "[{\n" +
+    "    \"constant\": false,\n" +
+    "    \"inputs\": [\n" +
+    "      {\n" +
+    "        \"name\": \"_to\",\n" +
+    "        \"type\": \"address\"\n" +
+    "      },\n" +
+    "      {\n" +
+    "        \"name\": \"_value\",\n" +
+    "        \"type\": \"uint256\"\n" +
+    "      }\n" +
+    "    ],\n" +
+    "    \"name\": \"transfer\",\n" +
+    "    \"outputs\": [\n" +
+    "      {\n" +
+    "        \"name\": \"success\",\n" +
+    "        \"type\": \"bool\"\n" +
+    "      }\n" +
+    "    ],\n" +
+    "    \"payable\": false,\n" +
+    "    \"type\": \"function\"\n" +
+    "  }]"
+    @State var params: String = "[\"0x...\",\"100000000000000000\"]"
+    @State var functionName: String = "transfer"
+    @State var gasLimit: String = ""
     @State var amountForEC: String = "0"
     
     
@@ -47,18 +69,33 @@ struct ContentView: View {
                     Text("지갑연결 (connectWallet)")
                         .font(.system(size: 17))
                         .bold()
-                    Text("체인 ID")
+                    Text("체인 ID (Optional)")
                         .font(.system(size: 13))
                     HStack(spacing: 0) {
-                        Text(chainId)
+                        TextField("", text: $chainId)
                             .keyboardType(.numberPad)
                             .lineLimit(1)
                             .font(.system(size: 20))
+                            .background(Color.white)
                         Spacer()
-                        Text("클레이튼(8217)만 지원")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color.red)
-                            .bold()
+                    }
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Klaytn Mainnet: 8217")
+                            .font(.system(size: 15))
+                        Text("Klaytn Testnet (Baobab): 1001")
+                            .font(.system(size: 15))
+                        Text("Ethereum Mainnet: 1")
+                            .font(.system(size: 15))
+                        Text("Ethereum Testnet (Goerli): 5")
+                            .font(.system(size: 15))
+                        Text("Polygon Mainnet: 137")
+                            .font(.system(size: 15))
+                        Text("Polygon Testnet (Mumbai): 80001")
+                            .font(.system(size: 15))
+                        Text("BSC Mainnet: 56")
+                            .font(.system(size: 15))
+                        Text("BSC Testnet: 97")
+                            .font(.system(size: 15))
                     }
                     Button(action: {
                         contentViewModel.requestConnectWallet(
@@ -88,6 +125,7 @@ struct ContentView: View {
                     TextField("", text: $message)
                         .font(.system(size: 20))
                         .lineLimit(1)
+                        .background(Color.white)
                     Button(action: {
                         contentViewModel.requestSignMessage(
                             chainId: self.chainId,
@@ -119,11 +157,13 @@ struct ContentView: View {
                     TextField("", text: $toAddress)
                         .font(.system(size: 20))
                         .lineLimit(1)
+                        .background(Color.white)
                     Text("보낼 수량 (단위: peb)")
                         .font(.system(size: 13))
                     TextField("", text: $amount)
                         .font(.system(size: 20))
                         .lineLimit(1)
+                        .background(Color.white)
                     Button(action: {
                         contentViewModel.requestSendCoin(
                             chainId: self.chainId,
@@ -156,41 +196,54 @@ struct ContentView: View {
                         TextField("", text: $contractAddress)
                             .font(.system(size: 20))
                             .lineLimit(1)
+                            .background(Color.white)
                     }
                     Group {
                         Text("ABI")
                             .font(.system(size: 13))
                         TextField("", text: $abi)
                             .font(.system(size: 20))
+                            .background(Color.white)
                     }
                     Group {
                         Text("파라미터")
                             .font(.system(size: 13))
                         TextField("", text: $params)
                             .font(.system(size: 20))
+                            .background(Color.white)
                     }
                     Group {
                         Text("함수명")
                             .font(.system(size: 13))
                         TextField("", text: $functionName)
                             .font(.system(size: 20))
+                            .background(Color.white)
                     }
                     Group {
                         Text("수량 (단위: peb)")
                             .font(.system(size: 13))
                         TextField("", text: $amountForEC)
                             .font(.system(size: 20))
+                            .background(Color.white)
+                    }
+                    Group {
+                        Text("가스 한도 (Optional)")
+                            .font(.system(size: 13))
+                        TextField("", text: $gasLimit)
+                            .font(.system(size: 20))
+                            .background(Color.white)
                     }
                     Button(action: {
                         self.params = "[\"\(contentViewModel.connectedAddress)\",\"0x1707Cc19778A773c45C1EA03f62482481d3c0fBD\",\"10\"]"
-                        
+                        var convertedGasLimit: String? = (gasLimit != "") ? gasLimit : nil
                         contentViewModel.requestExecuteContract(
                             chainId: self.chainId,
                             contractAddress: self.contractAddress,
                             abi: self.abi,
                             params: self.params,
                             value: self.amountForEC,
-                            functionName: self.functionName
+                            functionName: self.functionName,
+                            gasLimit: convertedGasLimit
                         )
                     }) {
                         Text("실행하기")

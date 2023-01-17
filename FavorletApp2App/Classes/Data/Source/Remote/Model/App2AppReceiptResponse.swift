@@ -11,6 +11,7 @@ public struct App2AppReceiptResponse: Decodable {
     public var requestId: String?
     public var expiredAt: Int?
     public var action: String?
+    public var chainId: Int?
     public var connectWallet: App2AppReceiptResponse.ConnectWallet?
     public var signMessage: App2AppReceiptResponse.SignMessage?
     public var transactions: [App2AppReceiptResponse.Transaction]?

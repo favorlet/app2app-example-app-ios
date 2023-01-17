@@ -14,6 +14,7 @@ public struct App2AppTransaction: Codable {
     var abi: String?
     var params: String?
     var functionName: String?
+    var gasLimit: String?
     
     
     public init(
@@ -22,7 +23,8 @@ public struct App2AppTransaction: Codable {
         value: String,
         abi: String? = nil,
         params: String? = nil,
-        functionName: String? = nil
+        functionName: String? = nil,
+        gasLimit: String? = nil
     ) {
         self.from = from
         self.to = to
@@ -30,6 +32,7 @@ public struct App2AppTransaction: Codable {
         self.abi = abi
         self.params = params
         self.functionName = functionName
+        self.gasLimit = gasLimit
     }
     
     
@@ -40,7 +43,8 @@ public struct App2AppTransaction: Codable {
             "value": self.value,
             "abi": self.abi,
             "params": self.params,
-            "functionName": self.functionName
+            "functionName": self.functionName,
+            "gasLimit": self.gasLimit
         ]
     }
 }

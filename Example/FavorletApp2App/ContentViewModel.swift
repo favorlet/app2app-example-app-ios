@@ -22,13 +22,16 @@ class ContentViewModel: ObservableObject {
     
     @Published var isProgress: Bool = false
     @Published var isConnectedWallet: Bool = false
+    @Published var receivedChainId: Int = -1
+    
+    @Published var errorToast: String = ""
+    
     
     private var blockChainApp = App2AppBlockChainApp(
         name: "App2App Example",
         successAppLink: nil,
         failAppLink: nil
     )
-    
     
     
     func requestConnectWallet(chainId: String) {
@@ -39,7 +42,7 @@ class ContentViewModel: ObservableObject {
                 let response = try await self.app2AppComponent.requestConnectWallet(
                     request: App2AppConnectWalletRequest(
                         action: "connectWallet",
-                        chainId: Int(chainId) ?? 0,
+                        chainId: Int(chainId) ?? nil,
                         blockChainApp: self.blockChainApp
                     )
                 )
@@ -118,7 +121,8 @@ class ContentViewModel: ObservableObject {
         abi: String,
         params: String,
         value: String,
-        functionName: String
+        functionName: String,
+        gasLimit: String? = nil
     ) {
         Task {
             do {
@@ -136,7 +140,8 @@ class ContentViewModel: ObservableObject {
                                 value: value,
                                 abi: abi,
                                 params: params,
-                                functionName: functionName
+                                functionName: functionName,
+                                gasLimit: gasLimit
                             )
                         ]
                     )
@@ -168,7 +173,6 @@ class ContentViewModel: ObservableObject {
             do {
                 print("Receipt 요청 !")
                 await MainActor.run { self.isProgress = true }
-                
                 let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
                 
                 await MainActor.run {
@@ -179,6 +183,10 @@ class ContentViewModel: ObservableObject {
                         case "connectWallet":
                             connectedAddress = response.connectWallet?.address ?? ""
                             isConnectedWallet = (connectedAddress != "")
+                            guard let chainId = response.chainId else {
+                                break
+                            }
+                            receivedChainId = chainId
                         case "signMessage":
                             signatureHash = response.signMessage?.signature ?? ""
                         case "sendCoin":

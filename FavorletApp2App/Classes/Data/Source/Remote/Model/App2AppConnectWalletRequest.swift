@@ -9,13 +9,13 @@ import Foundation
 
 public struct App2AppConnectWalletRequest: Codable {
     var action: String
-    var chainId: Int
+    var chainId: Int?
     var blockChainApp: App2AppBlockChainApp
 
     
     public init(
         action: String,
-        chainId: Int,
+        chainId: Int?,
         blockChainApp: App2AppBlockChainApp
     ) {
         self.action = action
@@ -25,10 +25,17 @@ public struct App2AppConnectWalletRequest: Codable {
     
     
     public func convertParams() -> [String: Any] {
-        return [
-            "action": self.action,
-            "chainId": self.chainId,
-            "blockChainApp": self.blockChainApp.convertParams()
-        ]
+        if chainId == nil {
+            return [
+                "action": self.action,
+                "blockChainApp": self.blockChainApp.convertParams()
+            ]
+        } else {
+            return [
+                "action": self.action,
+                "chainId": self.chainId!,
+                "blockChainApp": self.blockChainApp.convertParams()
+            ]
+        }
     }
 }

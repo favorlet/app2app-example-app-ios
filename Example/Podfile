@@ -4,8 +4,8 @@ platform :ios, '15.0'
 
 target 'FavorletApp2App_Example' do
   
-  pod 'FavorletApp2App', '~> 0.1.1'
-#  pod 'FavorletApp2App', :path => '../'
+#  pod 'FavorletApp2App', '~> 1.0.0'
+  pod 'FavorletApp2App', :path => '../'
 
   target 'FavorletApp2App_Tests' do
     inherit! :search_paths
