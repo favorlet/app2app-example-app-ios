@@ -1,5 +1,3 @@
-# app2app-sdk-ios
-
 # 개요
 
 FAVORLET은 NFT의 활용성을 극대화시키는 NFT 전용 지갑입니다. NFT에 특화된 다양한 기능을 제공하고 블록체인 위의 NFT를 오프라인 세상과 연결하여 새로운 NFT 경험을 만들어나가고 있습니다. 
@@ -15,7 +13,7 @@ FAVORLET은 NFT의 활용성을 극대화시키는 NFT 전용 지갑입니다. N
 FAVORLET의 app2app은 4가지의 기능을 제공합니다. 
 <b>지갑연결</b>은 사용자의 지갑 주소를 네이티브 앱에 가져오기 위한 기능으로, 지갑 주소가 있으면 블록체인 상의 존재하는 지갑 관련 데이터를 조회할 수 있습니다.
 <b>메시지 서명</b>은 네이티브 앱에서 지정한 메시지를 서명하여, 지갑의 소유권 확인이나, 인증/승인의 역할을 할 수 있는 기능입니다.
-<b>코인 전송</b>은 체인의 플랫폼 코인을 전송하는 기능입니다. (현재는 클레이튼 메인넷만 지원) 받을 지갑 주소와 수량을 지정하여 전송하실 수 있습니다. 
+<b>코인 전송</b>은 체인의 플랫폼 코인을 전송하는 기능입니다. 받을 지갑 주소와 수량을 지정하여 전송하실 수 있습니다. 
 <b>컨트랙트함수 실행</b>은 지정된 컨트랙트의 함수를 실행하는 기능으로, 함수명과 매개변수에 따라 다양한 기능을 수행할 수 있습니다.
 
 ## 동작흐름
@@ -57,7 +55,7 @@ iOS app2app SDK는 Cocoapods 를 통한 배포만 지원하고 있으므로, 네
 
 #### Podfile
 ```
-pod 'FavorletApp2App', '~> 1.0.0'
+pod 'FavorletApp2App', '~> 1.0.1'
 ```
 
 > pod install
@@ -67,10 +65,12 @@ pod 'FavorletApp2App', '~> 1.0.0'
 
 ### 공통 사항
 
-#### 지원하는 체인의 ID
+#### 지원하는 체인 ID
 
-- 클레이튼: 8217
-- 추후 타 체인 지원 예정.
+- 클레이튼: 메인넷 (8217), 테스트넷 Baobab (1001)    
+- 이더리움: 메인넷 (1), 테스트넷 Goerli (5)    
+- 폴리곤: 메인넷 (137), 테스트넷 Mumbai (80001)
+- 바이낸스스마트체인: 메인넷 (56), 테스트넷 (97)
 
 #### App2AppAction
 - CONNECT_WALLET : 지갑연결.
@@ -114,7 +114,7 @@ app2app의 각 기능 별로 필요한 매개변수는 아래 예시와 같이 �
 ```swift
 let request = App2AppConnectWalletRequest(
     action: App2AppAction.CONNECT_WALLET.value,    // 액션.
-    chainId: 8217,                                 // 체인ID. 현재는 클레이튼(8217)만 지원함.
+    chainId: 8217,                                 // 체인ID. (Optional - 지정하지 않을 경우 nil)
     blockChainApp: App2AppBlockChainApp(           // 네이티브 앱 정보.
         name: "App2App Sample",                    // 네이티브 앱 이름. (FAVORLET app2app 연동화면에 표시될 앱 이름)
         successAppLink: nil,                       // 현재는 미지원.
@@ -184,7 +184,8 @@ let request = App2AppExecuteContractRequest(
             abi: "{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"wad\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\",\"signature\":\"0x23b872dd\"}", // 실행할 함수의 ABI.
             value: "0",                    // 보낼 코인 수량. (단위: peb) 단, non-payable 함수인 경우에는 0으로 지정해야 함.
             params: "[\"0x123...456\", \"0x654...321\", 122]",     // 실행할 함수에 필요한 매개변수. JSONArray 문자열로 구성해야 함.
-            functionName: "transferFrom"   // 실행할 함수명.
+            functionName: "transferFrom",   // 실행할 함수명.
+            gasLimit = "10000"             // 가스 리밋값. (Optional - 이 값을 지정해서 보낼 경우, FAVORLET 에서는 이 값으로 설정)
         )
     )
 )
@@ -303,13 +304,33 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 
     
 # 제약사항
-22.11.25.금 기준
-
-#### 체인
-- 현재는 클레이튼 메인넷(8217) 만 지원.
-- 추후 타 체인 지원 예정.
+23.01.20 기준
 
 #### app2app 트랜잭션
 - 설계는 복수 트랜잭션 처리가 고려되어 있으나, 현재는 1개의 트랜잭션만 처리.
-- 만약 복수 개의 트랜잭션을 요청 시, FAVORLET에서는 첫번째 트랜잭션만 처리.
+- 만약 복수 개의 트랜잭션을 요청 시, FAVORLET에서는 첫번째 트랜잭션만 처리.    
+
+
+# 변경사항
+
+### 1.0.1 (22.01.20)
+
+#### 멀티 체인 지원
+- 기존의 클레이튼 메인넷 (8217) 외에 아래에 정의된 체인을 지원합니다.
+- 클레이튼 메인넷 (8217)
+- 클레이튼 테스트넷 Baobab (1001)
+- 이더리움 메인넷 (1)
+- 이더리움 테스트넷 Goerli (5)
+- 폴리곤 메인넷 (137)
+- 폴리곤 테스트넷 Mumbai (80001)
+- 바이낸스 스마트체인 메인넷 (56)
+- 바이낸스 스마트체인 테스트넷 (97)
+
+#### ChainId 옵셔널 처리
+- ConnectWallet 시에 ChainId 값이 필수가 아니고 옵셔널하게 변경되었습니다.
+- 따라서 ChainId를 지정하지 않고 ConnectWallet을 할 경우, Receipt에는 FAVORLET에 선택되어있는 ChainId가 전달됩니다. 
+
+#### ExecuteContract 에 gasLimit 옵션 추가
+- gasLimit 을 지정해서 요청할 경우, FAVORLET에서 해당 값으로 설정합니다.
+- gasLimit 을 지정하지 않고 요청할 경우, FAVORLET에서 설정합니다.
 
