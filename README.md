@@ -39,7 +39,7 @@ FAVORLET의 app2app은 <b>요청-실행-결과</b>의 3단계로 동작합니다
 > pod install
 
 XCode에서 /Example/FavorletApp2App.xcworkspace 파일을 열어주세요.
-UI는 <b>activity_main.xml</b>에 구성되어 있고, app2app 연동 관련 기능은 <b>ContentViewModel</b>에 구현되어 있습니다.
+UI는 <b>ContentView</b>에 구성되어 있고, app2app 연동 관련 기능은 <b>ContentViewModel</b>에 구현되어 있습니다.
 
 # 시작하기
 
