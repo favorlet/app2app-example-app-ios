@@ -77,6 +77,7 @@ struct ContentView: View {
                             .lineLimit(1)
                             .font(.system(size: 20))
                             .background(Color.white)
+                            
                         Spacer()
                     }
                     VStack(alignment: .leading, spacing: 0) {
@@ -201,15 +202,17 @@ struct ContentView: View {
                     Group {
                         Text("ABI")
                             .font(.system(size: 13))
-                        TextField("", text: $abi)
+                        TextField("", text: $abi, axis: .vertical)
                             .font(.system(size: 20))
+                            .lineLimit(10)
                             .background(Color.white)
                     }
                     Group {
                         Text("파라미터")
                             .font(.system(size: 13))
-                        TextField("", text: $params)
+                        TextField("", text: $params, axis: .vertical)
                             .font(.system(size: 20))
+                            .lineLimit(10)
                             .background(Color.white)
                     }
                     Group {
@@ -270,12 +273,9 @@ struct ContentView: View {
             
             contentViewModel.execute(requestId: requestId)
 
-//            let deeplinkUrl = URL(string: "https://favorlet.page.link/?link=https://favorlet.io?requestId=\(requestId)")
-//
-//            guard deeplinkUrl != nil else {
-//                return
-//            }
-//            openURL.callAsFunction(deeplinkUrl!)
+        }
+        .onReceive(contentViewModel.$receivedChainId) { chainId in
+            if chainId > 0 { self.chainId = "\(chainId)" }
         }
         .onChange(of: scenePhase) { phase in
             if phase == .active {
