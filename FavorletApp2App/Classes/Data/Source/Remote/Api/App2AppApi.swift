@@ -13,8 +13,6 @@ class App2AppApi: AlamofireManager {
         super.init(baseUrl: Constant.BASEURL_APP2APP)
     }
     
-    
-    
     func requestConnectWallet(
         request: App2AppConnectWalletRequest
     ) async throws -> App2AppConnectWalletResponse {
@@ -37,8 +35,6 @@ class App2AppApi: AlamofireManager {
             }
         }
     }
-    
-    
     
     func requestSignMessage(
         request: App2AppSignMessageRequest
@@ -63,8 +59,6 @@ class App2AppApi: AlamofireManager {
         }
     }
 
-    
-    
     func requestSendCoin(
         request: App2AppSendCoinRequest
     ) async throws -> App2AppSendCoinResponse {
@@ -88,8 +82,6 @@ class App2AppApi: AlamofireManager {
         }
     }
     
-    
-    
     func requestExecuteContract(
         request: App2AppExecuteContractRequest
     ) async throws -> App2AppExecuteContractResponse {
@@ -112,10 +104,6 @@ class App2AppApi: AlamofireManager {
             }
         }
     }
-    
-    
-    
-    
     
     func requestReceipt(
         requestId: String

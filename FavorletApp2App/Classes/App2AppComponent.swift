@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  App2AppComponent.swift
 //  FavorletApp2App
 //
 //  Created by evahpirazzi on 2022/12/07.
@@ -16,7 +16,6 @@ public class App2AppComponent: App2AppProtocol {
     private let executeUseCase: ExecuteUseCase
     private let receiptUseCase: ReceiptUseCase
     
-    
     public init() {
         self.requestConnectWalletUseCase = RequestConnectWalletUseCase()
         self.requestSignMessageUseCase = RequestSignMessageUseCase()
@@ -26,13 +25,11 @@ public class App2AppComponent: App2AppProtocol {
         self.receiptUseCase = ReceiptUseCase()
     }
     
-    
     public func requestConnectWallet(
         request: App2AppConnectWalletRequest
     ) async throws -> App2AppConnectWalletResponse {
         return try await requestConnectWalletUseCase.execute(request: request)
     }
-    
     
     public func requestSignMessage(
         request: App2AppSignMessageRequest
@@ -40,13 +37,11 @@ public class App2AppComponent: App2AppProtocol {
         return try await requestSignMessageUseCase.execute(request: request)
     }
     
-    
     public func requestSendCoin(
         request: App2AppSendCoinRequest
     ) async throws -> App2AppSendCoinResponse {
         return try await requestSendCoinUseCase.execute(request: request)
     }
-    
     
     public func requestExecuteContract(
         request: App2AppExecuteContractRequest
@@ -54,6 +49,11 @@ public class App2AppComponent: App2AppProtocol {
         return try await requestExecuteContractUseCase.execute(request: request)
     }
     
+    public func requestExecuteContractWithEncoded(
+        request: App2AppExecuteContractRequest
+    ) async throws -> App2AppExecuteContractResponse {
+        return try await requestExecuteContractUseCase.execute(request: request)
+    }
     
     public func execute(
         requestId: String

@@ -47,6 +47,7 @@ struct ContentView: View {
     "  }]"
     @State var params: String = "[\"0x...\",\"100000000000000000\"]"
     @State var functionName: String = "transfer"
+    @State var data: String = ""
     @State var gasLimit: String = ""
     @State var amountForEC: String = "0"
     
@@ -238,6 +239,61 @@ struct ContentView: View {
                     }
                     Button(action: {
                         self.params = "[\"\(contentViewModel.connectedAddress)\",\"0x1707Cc19778A773c45C1EA03f62482481d3c0fBD\",\"10\"]"
+                        var convertedGasLimit: String? = (gasLimit != "") ? gasLimit : nil
+                        contentViewModel.requestExecuteContract(
+                            chainId: self.chainId,
+                            contractAddress: self.contractAddress,
+                            abi: self.abi,
+                            params: self.params,
+                            value: self.amountForEC,
+                            functionName: self.functionName,
+                            gasLimit: convertedGasLimit
+                        )
+                    }) {
+                        Text("실행하기")
+                            .bold()
+                            .padding(.top, 15)
+                    }
+                    Text("결과")
+                        .font(.system(size: 13))
+                    Text(contentViewModel.resultExecuteContract)
+                        .font(.system(size: 15))
+                        .bold()
+                }
+                .padding(10)
+                .background(Color.gray.opacity(0.2))
+                .disabled(!contentViewModel.isConnectedWallet)
+                
+                /** 컨트랙트 함수 실행 (ExecuteContractWithEncoded) */
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("컨트랙트 실행 (executeContractWithEncoded)")
+                        .font(.system(size: 17))
+                        .bold()
+                    Group {
+                        Text("컨트랙트 주소")
+                            .font(.system(size: 13))
+                        TextField("", text: $contractAddress)
+                            .font(.system(size: 20))
+                            .lineLimit(1)
+                            .background(Color.white)
+                    }
+                    Group {
+                        Text("인코딩 데이터")
+                            .font(.system(size: 13))
+                        TextField("", text: $data, axis: .vertical)
+                            .font(.system(size: 20))
+                            .lineLimit(10)
+                            .background(Color.white)
+                    }
+                    Group {
+                        Text("가스 한도 (Optional)")
+                            .font(.system(size: 13))
+                        TextField("", text: $gasLimit)
+                            .font(.system(size: 20))
+                            .background(Color.white)
+                    }
+                    Button(action: {
+                        self.data = ""
                         var convertedGasLimit: String? = (gasLimit != "") ? gasLimit : nil
                         contentViewModel.requestExecuteContract(
                             chainId: self.chainId,
