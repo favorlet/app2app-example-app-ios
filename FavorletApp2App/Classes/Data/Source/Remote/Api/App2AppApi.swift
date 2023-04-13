@@ -10,7 +10,7 @@ import Foundation
 class App2AppApi: AlamofireManager {
     
     init() {
-        super.init(baseUrl: Constant.BASEURL_APP2APP)
+        super.init(baseUrl: "https://bridge.favorlet.link")
     }
     
     func requestConnectWallet(
