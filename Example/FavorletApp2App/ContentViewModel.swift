@@ -111,7 +111,7 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    // MARK: 1.0.4 이하만 지원
+    // MARK: 1.0.1 이하만 지원
 //    func requestExecuteContract(
 //        chainId: String,
 //        contractAddress: String,
@@ -217,7 +217,7 @@ class ContentViewModel: ObservableObject {
                         signatureHash = response.signMessage?.signature ?? ""
                     case App2AppAction.SEND_COIN.rawValue:
                         resultSendCoin = response.transactions?.first?.status ?? ""
-                        // MARK: 1.0.4 이하만 지원
+                        // MARK: 1.0.1 이하만 지원
 //                    case App2AppAction.EXECUTE_CONTRACT.rawValue:
 //                        resultExecuteContract = response.transactions?.first?.status ?? ""
                     case App2AppAction.EXECUTE_CONTRACT_WITH_ENCODED.rawValue:
