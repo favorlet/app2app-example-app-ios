@@ -10,10 +10,8 @@ import Foundation
 class App2AppApi: AlamofireManager {
     
     init() {
-        super.init(baseUrl: Constant.BASEURL_APP2APP)
+        super.init(baseUrl: "https://bridge.favorlet.link")
     }
-    
-    
     
     func requestConnectWallet(
         request: App2AppConnectWalletRequest
@@ -38,8 +36,6 @@ class App2AppApi: AlamofireManager {
         }
     }
     
-    
-    
     func requestSignMessage(
         request: App2AppSignMessageRequest
     ) async throws -> App2AppSignMessageResponse {
@@ -63,8 +59,6 @@ class App2AppApi: AlamofireManager {
         }
     }
 
-    
-    
     func requestSendCoin(
         request: App2AppSendCoinRequest
     ) async throws -> App2AppSendCoinResponse {
@@ -88,8 +82,6 @@ class App2AppApi: AlamofireManager {
         }
     }
     
-    
-    
     func requestExecuteContract(
         request: App2AppExecuteContractRequest
     ) async throws -> App2AppExecuteContractResponse {
@@ -112,10 +104,6 @@ class App2AppApi: AlamofireManager {
             }
         }
     }
-    
-    
-    
-    
     
     func requestReceipt(
         requestId: String

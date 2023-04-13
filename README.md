@@ -8,13 +8,14 @@ FAVORLET은 NFT의 활용성을 극대화시키는 NFT 전용 지갑입니다. N
 - 지갑연결 (connectWallet)
 - 메시지 서명 (signMessage)
 - 코인 전송 (sendCoin)
-- 컨트랙트함수 실행 (executeContract)
+- ~컨트랙트함수 실행 (executeContract)~ (1.0.1 이하)
+- 컨트랙트함수 실행 (executeContractWithEncoded) (1.0.2 이상)
 
 FAVORLET의 app2app은 4가지의 기능을 제공합니다. 
 <b>지갑연결</b>은 사용자의 지갑 주소를 네이티브 앱에 가져오기 위한 기능으로, 지갑 주소가 있으면 블록체인 상의 존재하는 지갑 관련 데이터를 조회할 수 있습니다.
 <b>메시지 서명</b>은 네이티브 앱에서 지정한 메시지를 서명하여, 지갑의 소유권 확인이나, 인증/승인의 역할을 할 수 있는 기능입니다.
 <b>코인 전송</b>은 체인의 플랫폼 코인을 전송하는 기능입니다. 받을 지갑 주소와 수량을 지정하여 전송하실 수 있습니다. 
-<b>컨트랙트함수 실행</b>은 지정된 컨트랙트의 함수를 실행하는 기능으로, 함수명과 매개변수에 따라 다양한 기능을 수행할 수 있습니다.
+<b>컨트랙트함수 실행</b>은 지정된 컨트랙트 함수를 실행하는 기능으로, 함수에 따라 다양한 기능을 수행할 수 있습니다.
 
 ## 동작흐름
 
@@ -35,11 +36,11 @@ FAVORLET의 app2app은 <b>요청-실행-결과</b>의 3단계로 동작합니다
 
 # 샘플앱 둘러보기
 
-샘플앱을 실행하시려면, <b>app2app-sdk-ios</b> 저장소를 Clone 하신 후에, /Example 폴더로 이동하여 아래 명령어를 입력해주세요.
+샘플앱을 실행하시려면, <b>favorlet-app2app-sdk-ios</b> 저장소를 Clone 하신 후에, /Example 폴더로 이동하여 아래 명령어를 입력해주세요.
 > pod install
 
 XCode에서 /Example/FavorletApp2App.xcworkspace 파일을 열어주세요.
-UI는 <b>ContentView</b>에 구성되어 있고, app2app 연동 관련 기능은 <b>ContentViewModel</b>에 구현되어 있습니다.
+UI는 SwiftUI 를 이용해 <b>ContentView</b>에 구성되어 있고, app2app 연동 관련 기능은 <b>ContentViewModel</b>에 구현되어 있습니다.
 
 # 시작하기
 
@@ -55,7 +56,7 @@ iOS app2app SDK는 Cocoapods 를 통한 배포만 지원하고 있으므로, 네
 
 #### Podfile
 ```
-pod 'FavorletApp2App', '~> 1.0.1'
+pod 'FavorletApp2App', '~> 1.0.2'
 ```
 
 > pod install
@@ -67,16 +68,24 @@ pod 'FavorletApp2App', '~> 1.0.1'
 
 #### 지원하는 체인 ID
 
-- 클레이튼: 메인넷 (8217), 테스트넷 Baobab (1001)    
-- 이더리움: 메인넷 (1), 테스트넷 Goerli (5)    
-- 폴리곤: 메인넷 (137), 테스트넷 Mumbai (80001)
-- 바이낸스스마트체인: 메인넷 (56), 테스트넷 (97)
+|네트워크명|Chain ID|
+|------|---:|
+|클레이튼 메인넷|8217|
+|클레이튼 테스트넷 (Baobab)|1001|
+|이더리움 메인넷|1|
+|이더리움 테스트넷 (Goerli)|5|
+|폴리곤 메인넷|137|
+|폴리곤 테스트넷 (Mumbai)|80001|
+|바이낸스 스마트체인 메인넷|56|
+|바이낸스 스마트체인 테스트넷|97|
+
 
 #### App2AppAction
 - CONNECT_WALLET : 지갑연결.
 - SIGN_MESSAGE : 메시지 서명.
 - SEND_COIN : 코인 전송.
-- EXECUTE_CONTRACT : 컨트랙트함수 실행.
+- ~EXECUTE_CONTRACT : 컨트랙트함수 실행.~ (1.0.1 이하)
+- EXECUTE_CONTRACT_WITH_ENCODED : 컨트랙트함수 실행 (1.0.2 이상)
 
 #### App2AppStatus
 - REQUESTED : app2app으로 수행할 액션 데이터를 요청한 상태.
@@ -91,8 +100,8 @@ pod 'FavorletApp2App', '~> 1.0.1'
 ```swift
 let app2AppComponent = App2AppComponent()
 ```
-네이티브 앱에서 app2app SDK의 기능을 호출하려면 App2AppComponent 인스턴스를 생성해야 합니다. App2AppComponent를 통해서만 사용 가능하기 때문입니다. 
-그리고 App2AppComponent의 실행 함수를 제외한 요청 및 결과 함수는 Swift Concurrency 를 이용한 비동기 함수로 구현되어 있습니다.
+app2app SDK의 모든 기능은 App2AppComponent를 통해서만 사용해야 합니다.
+App2AppComponent의 실행 함수를 제외한 요청 및 결과 함수는 Swift Concurrency 를 이용한 비동기 함수로 구현되어 있습니다.
 따라서 네이티브 앱에서 해당 함수를 호출할 때에는 await 키워드를 사용하여 호출해야 합니다.
 
 예시
@@ -167,14 +176,45 @@ let response = try await self.app2AppComponent.requestSendCoin(request)
 let requestId = response.requestId ?? ""
 ```
 
-#### 컨트랙트함수 실행
+#### 컨트랙트함수 실행 (1.0.2 이상)
+
+##### 기존 functionName, ABI, parameters 데이터를 전달하는 방식에서, 인코딩된 함수 데이터를 전달하는 방식으로 변경.
+##### - 인코딩된 함수데이터 예시) 0x095ea7b30000000000000000000000001f6d738ec0cf07a451af55b73bc610edb20c546c0000000000000000000000000000000000000000000000000000000000000000
+##### - 참고링크) [web3swift.sources.Web3+Contract.swift](https://github.com/web3swift-team/web3swift/blob/develop/Sources/web3swift/Web3/Web3%2BContract.swift)    
+
+##### - web3swift 기준) Web3+Contract.swift 의 createReadOperation() 함수 내에 인코딩하는 부분 참고
+ ```contract.method(method, parameters: parameters, extraData: extraData) else { return nil }```
+     
 ```swift
-let request = App2AppExecuteContractRequest(
+  let request = App2AppExecuteContractRequest(
     action: App2AppAction.EXECUTE_CONTRACT.value,
     chainId: 8217,
     blockChainApp: App2AppBlockChainApp(
         name: "App2App Sample",
-        successAppLink: nil,
+        successAppLink: nil,               
+        failAppLink: nil
+    ),
+    transactions: [                        // 실행할 트랜잭션 리스트. (단, 현재는 1개의 트랜잭션만 처리.)
+        App2AppTransaction(
+            from: "0x123...456",           // 트랜잭션을 전송할 지갑 주소.
+            to: "0x654...321",             // 컨트랙트 주소.
+            value: "0",                    // 보낼 코인 수량. (단위: peb) 단, non-payable 함수인 경우에는 0으로 지정해야 함.
+            data = "0xa9059cbb...0000",    // 인코딩된 함수데이터.
+            gasLimit = "10000"             // 가스 리밋값. (Optional - 이 값을 지정해서 보낼 경우, FAVORLET 에서는 이 값으로 설정)
+        )
+    )
+)
+let response = try await self.app2AppComponent.requestExecuteContract(request)
+let requestId = response.requestId ?? ""
+ ```
+    
+> #### ❗️ 기존 컨트랙트실행 (executeContract) 은 1.0.1 이하 버전만 지원
+> ~let request = App2AppExecuteContractRequest(
+    action: App2AppAction.EXECUTE_CONTRACT.value,
+    chainId: 8217,
+    blockChainApp: App2AppBlockChainApp(
+        name: "App2App Sample",
+        successAppLink: nil,               
         failAppLink: nil
     ),
     transactions: [                        // 실행할 트랜잭션 리스트. (단, 현재는 1개의 트랜잭션만 처리.)
@@ -190,8 +230,8 @@ let request = App2AppExecuteContractRequest(
     )
 )
 let response = try await self.app2AppComponent.requestExecuteContract(request)
-let requestId = response.requestId ?? ""
-```
+let requestId = response.requestId ?? ""~
+
 
 ### 실행함수 호출
 
@@ -278,8 +318,10 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
     ]
 }
 ```
+     
+~#### 컨트랙트함수 실행 (executeContract)~ (1.0.1 이하)
 
-#### 컨트랙트함수 실행 (executeContract)
+#### 컨트랙트함수 실행 (executeContractWithEncoded) (1.0.2 이상)
 - requestId (String) : 요청ID.
 - expiredAt (Int) : 요청 만료시간.
 - action (String) : 액션.
@@ -292,7 +334,7 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
   {
     "requestId": "278183ab-d3cb-4563-b0d4-ece1a2559f03",
     "expiredAt": 1664341448,
-    "action": "executeContract",
+    "action": "executeContractWithEncoded",
     "transactions": [
         {
             "status": "succeed",
@@ -301,10 +343,9 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
     ]
 }
 ```
-
-    
+     
 # 제약사항
-23.01.20 기준
+23.04.13 기준
 
 #### app2app 트랜잭션
 - 설계는 복수 트랜잭션 처리가 고려되어 있으나, 현재는 1개의 트랜잭션만 처리.
@@ -313,7 +354,13 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 
 # 변경사항
 
-### 1.0.1 (22.01.20)
+### 1.0.2 (23.04.13)
+
+#### 기존 컨트랙트함수 실행 (executeContract) 삭제
+#### 신규 컨트랙트함수 실행 (executeContractWithEncoded) 추가
+      
+
+### 1.0.1 (23.01.20)
 
 #### 멀티 체인 지원
 - 기존의 클레이튼 메인넷 (8217) 외에 아래에 정의된 체인을 지원합니다.

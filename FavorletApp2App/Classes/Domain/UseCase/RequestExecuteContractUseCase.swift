@@ -11,7 +11,9 @@ class RequestExecuteContractUseCase {
     
     private let app2AppRepository = App2AppRepository()
     
-    
+    /**
+     * ExecuteContract, ExecuteContractWithEncoded
+     */
     func execute(
         request: App2AppExecuteContractRequest
     ) async throws -> App2AppExecuteContractResponse {

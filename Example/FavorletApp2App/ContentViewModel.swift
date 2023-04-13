@@ -19,6 +19,7 @@ class ContentViewModel: ObservableObject {
     @Published var signatureHash: String = ""
     @Published var resultSendCoin: String = ""
     @Published var resultExecuteContract: String = ""
+    @Published var resultExecuteContractWithEncoded: String = ""
     
     @Published var isProgress: Bool = false
     @Published var isConnectedWallet: Bool = false
@@ -26,13 +27,11 @@ class ContentViewModel: ObservableObject {
     
     @Published var errorToast: String = ""
     
-    
     private var blockChainApp = App2AppBlockChainApp(
         name: "App2App Example",
         successAppLink: nil,
         failAppLink: nil
     )
-    
     
     func requestConnectWallet(chainId: String) {
         Task {
@@ -41,7 +40,7 @@ class ContentViewModel: ObservableObject {
                 
                 let response = try await self.app2AppComponent.requestConnectWallet(
                     request: App2AppConnectWalletRequest(
-                        action: "connectWallet",
+                        action: App2AppAction.CONNECT_WALLET.rawValue,
                         chainId: Int(chainId) ?? nil,
                         blockChainApp: self.blockChainApp
                     )
@@ -57,7 +56,6 @@ class ContentViewModel: ObservableObject {
         
     }
     
-    
     func requestSignMessage(chainId: String, message: String) {
         Task {
             do {
@@ -65,7 +63,7 @@ class ContentViewModel: ObservableObject {
                 
                 let response = try await app2AppComponent.requestSignMessage(
                     request: App2AppSignMessageRequest(
-                        action: "signMessage",
+                        action: App2AppAction.SIGN_MESSAGE.rawValue,
                         chainId: Int(chainId) ?? 0,
                         blockChainApp: self.blockChainApp,
                         signMessage: App2AppSignMessage(
@@ -84,7 +82,6 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    
     func requestSendCoin(chainId: String, toAddress: String, amount: String) {
         Task {
             do {
@@ -92,7 +89,7 @@ class ContentViewModel: ObservableObject {
             
                 let response = try await app2AppComponent.requestSendCoin(
                     request: App2AppSendCoinRequest(
-                        action: "sendCoin",
+                        action: App2AppAction.SEND_COIN.rawValue,
                         chainId: Int(chainId) ?? 0,
                         blockChainApp: self.blockChainApp,
                         transactions: [
@@ -114,33 +111,66 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    // MARK: 1.0.1 이하만 지원
+//    func requestExecuteContract(
+//        chainId: String,
+//        contractAddress: String,
+//        data: String,
+//        value: String,
+//        gasLimit: String? = nil
+//    ) {
+//        Task {
+//            do {
+//                await MainActor.run { self.isProgress = true }
+//
+//                let response = try await app2AppComponent.requestExecuteContract(
+//                    request: App2AppExecuteContractRequest(
+//                        action: App2AppAction.EXECUTE_CONTRACT.rawValue,
+//                        chainId: Int(chainId) ?? 0,
+//                        blockChainApp: self.blockChainApp,
+//                        transactions: [
+//                            App2AppTransaction(
+//                                from: self.connectedAddress,
+//                                contract: contractAddress,
+//                                value: value,
+//                                data: data,
+//                                gasLimit: gasLimit
+//                            )
+//                        ]
+//                    )
+//                )
+//                await MainActor.run {
+//                    self.isProgress = false
+//                    self.app2appRequestId = response.requestId ?? ""
+//                }
+//            } catch {
+//                await MainActor.run { self.isProgress = false }
+//            }
+//        }
+//    }
     
-    func requestExecuteContract(
+    func requestExecuteContractWithEncoded(
         chainId: String,
         contractAddress: String,
-        abi: String,
-        params: String,
         value: String,
-        functionName: String,
+        data: String,
         gasLimit: String? = nil
     ) {
         Task {
             do {
                 await MainActor.run { self.isProgress = true }
                 
-                let response = try await app2AppComponent.requestExecuteContract(
+                let response = try await app2AppComponent.requestExecuteContractWithEncoded(
                     request: App2AppExecuteContractRequest(
-                        action: "executeContract",
+                        action: App2AppAction.EXECUTE_CONTRACT_WITH_ENCODED.rawValue,
                         chainId: Int(chainId) ?? 0,
                         blockChainApp: self.blockChainApp,
                         transactions: [
                             App2AppTransaction(
                                 from: self.connectedAddress,
-                                to: contractAddress,
+                                contract: contractAddress,
                                 value: value,
-                                abi: abi,
-                                params: params,
-                                functionName: functionName,
+                                data: data,
                                 gasLimit: gasLimit
                             )
                         ]
@@ -157,21 +187,17 @@ class ContentViewModel: ObservableObject {
     }
     
     
-    
     func execute(requestId: String) {
         app2AppComponent.execute(requestId: requestId)
     }
     
     
-    
     func requestReceipt() {
         guard app2appRequestId != "" else {
-            print("Receipt 요청 취소")
             return
         }
         Task {
             do {
-                print("Receipt 요청 !")
                 await MainActor.run { self.isProgress = true }
                 let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
                 
@@ -180,21 +206,24 @@ class ContentViewModel: ObservableObject {
                     app2appRequestId = ""
                     
                     switch response.action {
-                        case "connectWallet":
-                            connectedAddress = response.connectWallet?.address ?? ""
-                            isConnectedWallet = (connectedAddress != "")
-                            guard let chainId = response.chainId else {
-                                break
-                            }
-                            receivedChainId = chainId
-                        case "signMessage":
-                            signatureHash = response.signMessage?.signature ?? ""
-                        case "sendCoin":
-                            resultSendCoin = response.transactions?.first?.status ?? ""
-                        case "executeContract":
-                            resultExecuteContract = response.transactions?.first?.status ?? ""
-                        default:
-                            isProgress = false
+                    case App2AppAction.CONNECT_WALLET.rawValue:
+                        connectedAddress = response.connectWallet?.address ?? ""
+                        isConnectedWallet = (connectedAddress != "")
+                        guard let chainId = response.chainId else {
+                            break
+                        }
+                        receivedChainId = chainId
+                    case App2AppAction.SIGN_MESSAGE.rawValue:
+                        signatureHash = response.signMessage?.signature ?? ""
+                    case App2AppAction.SEND_COIN.rawValue:
+                        resultSendCoin = response.transactions?.first?.status ?? ""
+                        // MARK: 1.0.1 이하만 지원
+//                    case App2AppAction.EXECUTE_CONTRACT.rawValue:
+//                        resultExecuteContract = response.transactions?.first?.status ?? ""
+                    case App2AppAction.EXECUTE_CONTRACT_WITH_ENCODED.rawValue:
+                        resultExecuteContractWithEncoded = response.transactions?.first?.status ?? ""
+                    default:
+                        isProgress = false
                     }
                 }
             } catch {

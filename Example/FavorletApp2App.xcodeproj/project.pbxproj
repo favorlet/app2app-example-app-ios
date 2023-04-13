@@ -12,6 +12,7 @@
 		9B391AF22941CD3600A30E3D /* FavorletApp2AppExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B391AF12941CD3600A30E3D /* FavorletApp2AppExampleApp.swift */; };
 		9B391AF42941CD7F00A30E3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B391AF32941CD7F00A30E3D /* ContentView.swift */; };
 		9B391AF62941D01500A30E3D /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B391AF52941D01500A30E3D /* ContentViewModel.swift */; };
+		9B63EE0229E824DF0052D432 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B63EE0129E824DF0052D432 /* Constant.swift */; };
 		CF102743A5BB670508B2CC5F /* Pods_FavorletApp2App_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C112BE832E0D9DE79DC791AA /* Pods_FavorletApp2App_Example.framework */; };
 		EE632D8FDCADCBCC731D65BD /* Pods_FavorletApp2App_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A6566A77031771561B965F5 /* Pods_FavorletApp2App_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -40,6 +41,7 @@
 		9B391AF12941CD3600A30E3D /* FavorletApp2AppExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavorletApp2AppExampleApp.swift; sourceTree = "<group>"; };
 		9B391AF32941CD7F00A30E3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9B391AF52941D01500A30E3D /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
+		9B63EE0129E824DF0052D432 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		B9107445B29BED91BF2501E5 /* Pods-FavorletApp2App_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FavorletApp2App_Tests.release.xcconfig"; path = "Target Support Files/Pods-FavorletApp2App_Tests/Pods-FavorletApp2App_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		BEFF004CF71697B4DD53DF76 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		C112BE832E0D9DE79DC791AA /* Pods_FavorletApp2App_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FavorletApp2App_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,6 +105,7 @@
 				9B391AF12941CD3600A30E3D /* FavorletApp2AppExampleApp.swift */,
 				9B391AF32941CD7F00A30E3D /* ContentView.swift */,
 				9B391AF52941D01500A30E3D /* ContentViewModel.swift */,
+				9B63EE0129E824DF0052D432 /* Constant.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
@@ -333,6 +336,7 @@
 				9B391AF42941CD7F00A30E3D /* ContentView.swift in Sources */,
 				9B391AF22941CD3600A30E3D /* FavorletApp2AppExampleApp.swift in Sources */,
 				9B391AF62941D01500A30E3D /* ContentViewModel.swift in Sources */,
+				9B63EE0229E824DF0052D432 /* Constant.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

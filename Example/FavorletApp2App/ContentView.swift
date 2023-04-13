@@ -16,39 +16,13 @@ struct ContentView: View {
     @StateObject var contentViewModel = ContentViewModel()
     
     @State var chainId: String = ""
-    
     @State var message: String = "favorlet"
-    
-    @State var toAddress: String = "0x..."
-    @State var amount: String = "100000000000000000" // 0.1 KLAY
-    
-    @State var contractAddress: String = "0xe34acbf6fd2bc844be302e4acc97f401f6cd6985"
-    @State var abi: String = "[{\n" +
-    "    \"constant\": false,\n" +
-    "    \"inputs\": [\n" +
-    "      {\n" +
-    "        \"name\": \"_to\",\n" +
-    "        \"type\": \"address\"\n" +
-    "      },\n" +
-    "      {\n" +
-    "        \"name\": \"_value\",\n" +
-    "        \"type\": \"uint256\"\n" +
-    "      }\n" +
-    "    ],\n" +
-    "    \"name\": \"transfer\",\n" +
-    "    \"outputs\": [\n" +
-    "      {\n" +
-    "        \"name\": \"success\",\n" +
-    "        \"type\": \"bool\"\n" +
-    "      }\n" +
-    "    ],\n" +
-    "    \"payable\": false,\n" +
-    "    \"type\": \"function\"\n" +
-    "  }]"
-    @State var params: String = "[\"0x...\",\"100000000000000000\"]"
-    @State var functionName: String = "transfer"
+    @State var toAddress: String = ""
+    @State var value: String = ""
+    @State var contractAddress: String = ""
+    @State var data: String = ""
     @State var gasLimit: String = ""
-    @State var amountForEC: String = "0"
+    @State var valueForEC: String = ""
     
     
     var body: some View {
@@ -72,7 +46,7 @@ struct ContentView: View {
                     Text("체인 ID (Optional)")
                         .font(.system(size: 13))
                     HStack(spacing: 0) {
-                        TextField("", text: $chainId)
+                        TextField("ex) 8217", text: $chainId)
                             .keyboardType(.numberPad)
                             .lineLimit(1)
                             .font(.system(size: 20))
@@ -99,6 +73,8 @@ struct ContentView: View {
                             .font(.system(size: 15))
                     }
                     Button(action: {
+                        UserDefaults.standard.setValue(chainId, forKey: Constant.CHAIN_ID.rawValue)
+                        
                         contentViewModel.requestConnectWallet(
                             chainId: self.chainId
                         )
@@ -123,11 +99,13 @@ struct ContentView: View {
                         .bold()
                     Text("메시지 원본")
                         .font(.system(size: 13))
-                    TextField("", text: $message)
+                    TextField("ex) favorlet", text: $message)
                         .font(.system(size: 20))
                         .lineLimit(1)
                         .background(Color.white)
                     Button(action: {
+                        UserDefaults.standard.setValue(message, forKey: Constant.MESSAGE.rawValue)
+                        
                         contentViewModel.requestSignMessage(
                             chainId: self.chainId,
                             message: self.message
@@ -155,21 +133,24 @@ struct ContentView: View {
                         .bold()
                     Text("받을 지갑주소")
                         .font(.system(size: 13))
-                    TextField("", text: $toAddress)
+                    TextField("ex) 0x{hex}", text: $toAddress)
                         .font(.system(size: 20))
                         .lineLimit(1)
                         .background(Color.white)
-                    Text("보낼 수량 (단위: peb)")
+                    Text("보낼 수량 (단위: peb, wei)")
                         .font(.system(size: 13))
-                    TextField("", text: $amount)
+                    TextField("ex) 1000000000000000000", text: $value)
                         .font(.system(size: 20))
                         .lineLimit(1)
                         .background(Color.white)
                     Button(action: {
+                        UserDefaults.standard.setValue(toAddress, forKey: Constant.TO_ADDRESS.rawValue)
+                        UserDefaults.standard.setValue(value, forKey: Constant.VALUE.rawValue)
+                        
                         contentViewModel.requestSendCoin(
                             chainId: self.chainId,
                             toAddress: self.toAddress,
-                            amount: self.amount)
+                            amount: self.value)
                     }) {
                         Text("전송하기")
                             .bold()
@@ -186,66 +167,55 @@ struct ContentView: View {
                 .background(Color.gray.opacity(0.2))
                 .disabled(!contentViewModel.isConnectedWallet)
                 
-                /** 컨트랙트 실행 (executeContract) */
+                
+                /** 컨트랙트 함수 실행 (ExecuteContractWithEncoded) */
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("컨트랙트 실행 (executeContract)")
+                    Text("컨트랙트 실행 (executeContractWithEncoded)")
                         .font(.system(size: 17))
                         .bold()
                     Group {
                         Text("컨트랙트 주소")
                             .font(.system(size: 13))
-                        TextField("", text: $contractAddress)
+                        TextField("ex) 0x{hex}", text: $contractAddress)
                             .font(.system(size: 20))
                             .lineLimit(1)
                             .background(Color.white)
                     }
                     Group {
-                        Text("ABI")
+                        Text("인코딩된 함수데이터")
                             .font(.system(size: 13))
-                        TextField("", text: $abi, axis: .vertical)
+                        TextField("ex) 0x{hex}", text: $data, axis: .vertical)
                             .font(.system(size: 20))
                             .lineLimit(10)
                             .background(Color.white)
                     }
                     Group {
-                        Text("파라미터")
+                        Text("보낼 수량 (단위: peb, wei)")
                             .font(.system(size: 13))
-                        TextField("", text: $params, axis: .vertical)
+                        TextField("ex) 1000000000000000000", text: $valueForEC)
                             .font(.system(size: 20))
-                            .lineLimit(10)
+                            .lineLimit(1)
                             .background(Color.white)
                     }
                     Group {
-                        Text("함수명")
-                            .font(.system(size: 13))
-                        TextField("", text: $functionName)
-                            .font(.system(size: 20))
-                            .background(Color.white)
-                    }
-                    Group {
-                        Text("수량 (단위: peb)")
-                            .font(.system(size: 13))
-                        TextField("", text: $amountForEC)
-                            .font(.system(size: 20))
-                            .background(Color.white)
-                    }
-                    Group {
-                        Text("가스 한도 (Optional)")
+                        Text("가스 Limit (Optional)")
                             .font(.system(size: 13))
                         TextField("", text: $gasLimit)
                             .font(.system(size: 20))
                             .background(Color.white)
                     }
                     Button(action: {
-                        self.params = "[\"\(contentViewModel.connectedAddress)\",\"0x1707Cc19778A773c45C1EA03f62482481d3c0fBD\",\"10\"]"
-                        var convertedGasLimit: String? = (gasLimit != "") ? gasLimit : nil
-                        contentViewModel.requestExecuteContract(
+                        let convertedGasLimit: String? = (gasLimit != "") ? gasLimit : nil
+                        UserDefaults.standard.setValue(contractAddress, forKey: Constant.EC_CONTRACT_ADDRESS.rawValue)
+                        UserDefaults.standard.setValue(valueForEC, forKey: Constant.EC_VALUE.rawValue)
+                        UserDefaults.standard.setValue(data, forKey: Constant.EC_DATA.rawValue)
+                        UserDefaults.standard.setValue(gasLimit, forKey: Constant.EC_GAS_LIMIT.rawValue)
+                        
+                        contentViewModel.requestExecuteContractWithEncoded(
                             chainId: self.chainId,
                             contractAddress: self.contractAddress,
-                            abi: self.abi,
-                            params: self.params,
-                            value: self.amountForEC,
-                            functionName: self.functionName,
+                            value: self.valueForEC,
+                            data: self.data,
                             gasLimit: convertedGasLimit
                         )
                     }) {
@@ -264,6 +234,16 @@ struct ContentView: View {
                 .disabled(!contentViewModel.isConnectedWallet)
             }
             .padding()
+        }
+        .onAppear() {
+            chainId = UserDefaults.standard.string(forKey: Constant.CHAIN_ID.rawValue) ?? ""
+            message = UserDefaults.standard.string(forKey: Constant.MESSAGE.rawValue) ?? "favorlet"
+            toAddress = UserDefaults.standard.string(forKey: Constant.TO_ADDRESS.rawValue) ?? "0x..."
+            value = UserDefaults.standard.string(forKey: Constant.VALUE.rawValue) ?? "1000000000000000000"
+            contractAddress = UserDefaults.standard.string(forKey: Constant.EC_CONTRACT_ADDRESS.rawValue) ?? ""
+            valueForEC = UserDefaults.standard.string(forKey: Constant.EC_VALUE.rawValue) ?? "0"
+            data = UserDefaults.standard.string(forKey: Constant.EC_DATA.rawValue) ?? ""
+            gasLimit = UserDefaults.standard.string(forKey: Constant.EC_GAS_LIMIT.rawValue) ?? ""
         }
         .onReceive(contentViewModel.$app2appRequestId) { requestId in
             guard requestId != "" else {
