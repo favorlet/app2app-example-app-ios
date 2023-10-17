@@ -10,6 +10,7 @@ import Foundation
 public class App2AppComponent: App2AppProtocol {
     
     private let requestConnectWalletUseCase: RequestConnectWalletUseCase
+    private let requestConnectWalletAndSignMessageUseCase: RequestConnectWalletAndSignMessageUseCase
     private let requestSignMessageUseCase: RequestSignMessageUseCase
     private let requestSendCoinUseCase: RequestSendCoinUseCase
     private let requestExecuteContractUseCase: RequestExecuteContractUseCase
@@ -18,6 +19,7 @@ public class App2AppComponent: App2AppProtocol {
     
     public init() {
         self.requestConnectWalletUseCase = RequestConnectWalletUseCase()
+        self.requestConnectWalletAndSignMessageUseCase = RequestConnectWalletAndSignMessageUseCase()
         self.requestSignMessageUseCase = RequestSignMessageUseCase()
         self.requestSendCoinUseCase = RequestSendCoinUseCase()
         self.requestExecuteContractUseCase = RequestExecuteContractUseCase()
@@ -29,6 +31,12 @@ public class App2AppComponent: App2AppProtocol {
         request: App2AppConnectWalletRequest
     ) async throws -> App2AppConnectWalletResponse {
         return try await requestConnectWalletUseCase.execute(request: request)
+    }
+    
+    public func requestConnectWalletAndSignMessage(
+        request: App2AppConnectWalletAndSignMessageRequest
+    ) async throws -> App2AppConnectWalletAndSignMessageResponse {
+        return try await requestConnectWalletAndSignMessageUseCase.execute(request: request)
     }
     
     public func requestSignMessage(

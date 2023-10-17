@@ -36,12 +36,16 @@ class ContentViewModel: ObservableObject {
     func requestConnectWallet(chainId: String) {
         Task {
             do {
+                guard let chainId = Int(chainId) else {
+                    return
+                }
+                
                 await MainActor.run { self.isProgress = true }
                 
                 let response = try await self.app2AppComponent.requestConnectWallet(
                     request: App2AppConnectWalletRequest(
                         action: App2AppAction.CONNECT_WALLET.rawValue,
-                        chainId: Int(chainId) ?? nil,
+                        chainId: chainId,
                         blockChainApp: self.blockChainApp
                     )
                 )
@@ -53,7 +57,35 @@ class ContentViewModel: ObservableObject {
                 await MainActor.run { self.isProgress = false }
             }
         }
-        
+    }
+    
+    func requestConnectWalletAndSignMessage(chainId: String, message: String) {
+        Task {
+            do {
+                guard let chainId = Int(chainId) else {
+                    return
+                }
+                
+                await MainActor.run { self.isProgress = true }
+                
+                let response = try await app2AppComponent.requestConnectWalletAndSignMessage(
+                    request: App2AppConnectWalletAndSignMessageRequest(
+                        action: App2AppAction.CONNECT_WALLET_AND_SIGN_MESSAGE.rawValue,
+                        chainId: chainId,
+                        blockChainApp: self.blockChainApp,
+                        connectWalletAndSignMessage: App2AppConnectWalletAndSignMessage(
+                            value: message
+                        )
+                    )
+                )
+                await MainActor.run {
+                    self.isProgress = false
+                    self.app2appRequestId = response.requestId ?? ""
+                }
+            } catch {
+                await MainActor.run { self.isProgress = false }
+            }
+        }
     }
     
     func requestSignMessage(chainId: String, message: String) {
@@ -110,44 +142,6 @@ class ContentViewModel: ObservableObject {
             }
         }
     }
-    
-    // MARK: 1.0.1 이하만 지원
-//    func requestExecuteContract(
-//        chainId: String,
-//        contractAddress: String,
-//        data: String,
-//        value: String,
-//        gasLimit: String? = nil
-//    ) {
-//        Task {
-//            do {
-//                await MainActor.run { self.isProgress = true }
-//
-//                let response = try await app2AppComponent.requestExecuteContract(
-//                    request: App2AppExecuteContractRequest(
-//                        action: App2AppAction.EXECUTE_CONTRACT.rawValue,
-//                        chainId: Int(chainId) ?? 0,
-//                        blockChainApp: self.blockChainApp,
-//                        transactions: [
-//                            App2AppTransaction(
-//                                from: self.connectedAddress,
-//                                contract: contractAddress,
-//                                value: value,
-//                                data: data,
-//                                gasLimit: gasLimit
-//                            )
-//                        ]
-//                    )
-//                )
-//                await MainActor.run {
-//                    self.isProgress = false
-//                    self.app2appRequestId = response.requestId ?? ""
-//                }
-//            } catch {
-//                await MainActor.run { self.isProgress = false }
-//            }
-//        }
-//    }
     
     func requestExecuteContractWithEncoded(
         chainId: String,
@@ -213,15 +207,24 @@ class ContentViewModel: ObservableObject {
                             break
                         }
                         receivedChainId = chainId
+                        
+                    case App2AppAction.CONNECT_WALLET_AND_SIGN_MESSAGE.rawValue:
+                        connectedAddress = response.connectWalletAndSignMessage?.address ?? ""
+                        signatureHash = response.connectWalletAndSignMessage?.signature ?? ""
+                        
                     case App2AppAction.SIGN_MESSAGE.rawValue:
                         signatureHash = response.signMessage?.signature ?? ""
+                        
                     case App2AppAction.SEND_COIN.rawValue:
                         resultSendCoin = response.transactions?.first?.status ?? ""
+                        
                         // MARK: 1.0.1 이하만 지원
 //                    case App2AppAction.EXECUTE_CONTRACT.rawValue:
 //                        resultExecuteContract = response.transactions?.first?.status ?? ""
+                        
                     case App2AppAction.EXECUTE_CONTRACT_WITH_ENCODED.rawValue:
                         resultExecuteContractWithEncoded = response.transactions?.first?.status ?? ""
+                        
                     default:
                         isProgress = false
                     }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+ 
 class App2AppRepository {
     private var app2AppApi: App2AppApi = App2AppApi()
     
@@ -15,6 +15,13 @@ class App2AppRepository {
         request: App2AppConnectWalletRequest
     ) async throws -> App2AppConnectWalletResponse {
         return try await app2AppApi.requestConnectWallet(request: request)
+    }
+    
+    
+    func requestConnectWalletAndSignMessage(
+        request: App2AppConnectWalletAndSignMessageRequest
+    ) async throws -> App2AppConnectWalletAndSignMessageResponse {
+        return try await app2AppApi.requestConnectWalletAndSignMessage(request: request)
     }
     
     
@@ -32,13 +39,11 @@ class App2AppRepository {
     }
     
     
-    
     func requestExecuteContract(
         request: App2AppExecuteContractRequest
     ) async throws -> App2AppExecuteContractResponse {
         return try await app2AppApi.requestExecuteContract(request: request)
     }
-    
     
     
     func requestReceipt(
