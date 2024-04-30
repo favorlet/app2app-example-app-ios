@@ -84,9 +84,9 @@ $ pod install
 
 #### App2AppAction
 - CONNECT_WALLET : 지갑연결.
+- CONNECT_WALLET_AND_SIGN_MESSAGE : 지갑연결 및 메시지 서명.
 - SIGN_MESSAGE : 메시지 서명.
 - SEND_COIN : 코인 전송.
-- ~EXECUTE_CONTRACT : 컨트랙트함수 실행.~ (1.0.1 이하)
 - EXECUTE_CONTRACT_WITH_ENCODED : 컨트랙트함수 실행 (1.0.2 이상)
 
 #### App2AppStatus
@@ -141,9 +141,13 @@ let requestId = response.requestId ?? ""
 let request = App2AppConnectWalletAndSignMessageRequest(
     action: App2AppAction.CONNECT_WALLET_AND_SIGN_MESSAGE.rawValue,
     chainId: chainId,
-    blockChainApp: self.blockChainApp,
+    blockChainApp: App2AppBlockChainApp(
+        name: "App2App Sample",
+        successAppLink: nil,
+        failAppLink: nil
+    ),
     connectWalletAndSignMessage: App2AppConnectWalletAndSignMessage(
-        value: message
+        value: "favorlet"                          // 메시지 원문.
     )
 )
 let response = try await self.app2appComponent.requestConnectWalletAndSignMessage(request)
@@ -263,7 +267,30 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
     "address": "0x123...123"
   }
 }
+```
 
+#### 지갑연결 및 메시지 서명 (connectWalletAndSignMessage)
+
+- requestId (String) : 요청ID.
+- expiredAt (Int) : 요청 만료시간.
+- action (String) : 액션.
+- connectWalletAndSignMessage (App2AppReceiptResponse.ConnectWalletAndSignMessage) : 메시지 서명 정보.
+  - statue (String) : 상태.
+  - signature (String) : 메시지 해시값.
+  - address (String) : 서명한 지갑주소.  
+
+예시
+```json
+{
+    "requestId": "171bb348-a2ce-4286-a48d-38139a459a6e",
+    "expiredAt": 1714465007,
+    "action": "connectWalletAndSignMessage",
+    "connectWalletAndSignMessage": {
+        "status": "succeed",
+        "signature": "0x6b588fc7c4fe83abe3ad72d06fe75a9b9d6141e71232399e997515df5fa17a410d20ae1fec34f873edb51586c86111c52906949ed73c232b17a3aacfd206b32c1b",
+        "address": "0x06d101706d722f67eac76eb14fd0aa3f46c8b02e"
+    }
+}
 ```
 
 #### 메시지 서명 (signMessage)
