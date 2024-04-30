@@ -210,6 +210,10 @@ class ContentViewModel: ObservableObject {
                         
                     case App2AppAction.CONNECT_WALLET_AND_SIGN_MESSAGE.rawValue:
                         connectedAddress = response.connectWalletAndSignMessage?.address ?? ""
+                        isConnectedWallet = (connectedAddress != "")
+                        guard let chainId = response.chainId else {
+                            break
+                        }
                         signatureHash = response.connectWalletAndSignMessage?.signature ?? ""
                         
                     case App2AppAction.SIGN_MESSAGE.rawValue:
