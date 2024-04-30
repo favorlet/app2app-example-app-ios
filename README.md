@@ -6,13 +6,14 @@ FAVORLET은 NFT의 활용성을 극대화시키는 NFT 전용 지갑입니다. N
 ## 기능
 
 - 지갑연결 (connectWallet)
+- 지갑연결 및 메시지 서명 (connectWalletAndSignMessage) (1.1.0 이상)
 - 메시지 서명 (signMessage)
 - 코인 전송 (sendCoin)
-- ~컨트랙트함수 실행 (executeContract)~ (1.0.1 이하)
 - 컨트랙트함수 실행 (executeContractWithEncoded) (1.0.2 이상)
 
 FAVORLET의 app2app은 4가지의 기능을 제공합니다. 
 <b>지갑연결</b>은 사용자의 지갑 주소를 네이티브 앱에 가져오기 위한 기능으로, 지갑 주소가 있으면 블록체인 상의 존재하는 지갑 관련 데이터를 조회할 수 있습니다.
+<b>지갑연결 및 메시지 서명</b> 은 지갑연결과 메시지 서명을 동시에 수행하는 기능으로, 연결 후 서명을 받는 번거로운 작업을 한번에 수행할 수 있습니다.
 <b>메시지 서명</b>은 네이티브 앱에서 지정한 메시지를 서명하여, 지갑의 소유권 확인이나, 인증/승인의 역할을 할 수 있는 기능입니다.
 <b>코인 전송</b>은 체인의 플랫폼 코인을 전송하는 기능입니다. 받을 지갑 주소와 수량을 지정하여 전송하실 수 있습니다. 
 <b>컨트랙트함수 실행</b>은 지정된 컨트랙트 함수를 실행하는 기능으로, 함수에 따라 다양한 기능을 수행할 수 있습니다.
@@ -56,11 +57,12 @@ iOS app2app SDK는 Cocoapods 를 통한 배포만 지원하고 있으므로, 네
 
 #### Podfile
 ```
-pod 'FavorletApp2App', '~> 1.0.2'
+pod 'FavorletApp2App', '~> 1.1.0'
 ```
 
-> pod install
-
+```bash
+$ pod install
+```
 
 ## SDK 사용하기
 
@@ -122,7 +124,7 @@ app2app의 각 기능 별로 필요한 매개변수는 아래 예시와 같이 �
 #### 지갑연결
 ```swift
 let request = App2AppConnectWalletRequest(
-    action: App2AppAction.CONNECT_WALLET.value,    // 액션.
+    action: App2AppAction.CONNECT_WALLET.rawValue,    // 액션.
     chainId: 8217,                                 // 체인ID. (Optional - 지정하지 않을 경우 nil)
     blockChainApp: App2AppBlockChainApp(           // 네이티브 앱 정보.
         name: "App2App Sample",                    // 네이티브 앱 이름. (FAVORLET app2app 연동화면에 표시될 앱 이름)
@@ -134,11 +136,24 @@ let response = try await self.app2AppComponent.requestConnectWallet(request)
 let requestId = response.requestId ?? ""
 ```
 
+#### 지갑연결 및 메시지 서명
+```swift
+let request = App2AppConnectWalletAndSignMessageRequest(
+    action: App2AppAction.CONNECT_WALLET_AND_SIGN_MESSAGE.rawValue,
+    chainId: chainId,
+    blockChainApp: self.blockChainApp,
+    connectWalletAndSignMessage: App2AppConnectWalletAndSignMessage(
+        value: message
+    )
+)
+let response = try await self.app2appComponent.requestConnectWalletAndSignMessage(request)
+let requestId = response.requestId ?? ""
+```
 
 #### 메시지 서명
 ```swift
 let request = App2AppSignMessageRequest(
-    action: App2AppAction.SIGN_MESSAGE.value,
+    action: App2AppAction.SIGN_MESSAGE.rawValue,
     chainId: 8217,
     blockChainApp: App2AppBlockChainApp(
         name: "App2App Sample",
@@ -157,7 +172,7 @@ let requestId = response.requestId ?? ""
 #### 코인 전송
 ```swift
 let request = App2AppSendCoinRequest(
-    action: App2AppAction.SEND_COIN.value,
+    action: App2AppAction.SEND_COIN.rawValue,
     chainId: 8217,
     blockChainApp: App2AppBlockChainApp(
         name: "App2App Sample",
@@ -179,10 +194,10 @@ let requestId = response.requestId ?? ""
 #### 컨트랙트함수 실행 (1.0.2 이상)
 
 ##### 기존 functionName, ABI, parameters 데이터를 전달하는 방식에서, 인코딩된 함수 데이터를 전달하는 방식으로 변경.
-##### - 인코딩된 함수데이터 예시) 0x095ea7b30000000000000000000000001f6d738ec0cf07a451af55b73bc610edb20c546c0000000000000000000000000000000000000000000000000000000000000000
-##### - 참고링크) [web3swift.sources.Web3+Contract.swift](https://github.com/web3swift-team/web3swift/blob/develop/Sources/web3swift/Web3/Web3%2BContract.swift)    
+##### - 인코딩된 함수데이터 예시 0x095ea7b30000000000000000000000001f6d738ec0cf07a451af55b73bc610edb20c546c0000000000000000000000000000000000000000000000000000000000000000
+##### - 참고링크 [[web3swift.sources.Web3+Contract.swift]](https://github.com/web3swift-team/web3swift/blob/develop/Sources/web3swift/Web3/Web3%2BContract.swift)    
 
-##### - web3swift 기준) Web3+Contract.swift 의 createReadOperation() 함수 내에 인코딩하는 부분 참고
+##### - web3swift 기준 : Web3+Contract.swift 의 createReadOperation() 함수 내에 인코딩하는 부분 참고
  ```contract.method(method, parameters: parameters, extraData: extraData) else { return nil }```
      
 ```swift
@@ -207,30 +222,6 @@ let requestId = response.requestId ?? ""
 let response = try await self.app2AppComponent.requestExecuteContract(request)
 let requestId = response.requestId ?? ""
  ```
-    
-> #### ❗️ 기존 컨트랙트실행 (executeContract) 은 1.0.1 이하 버전만 지원
-> ~let request = App2AppExecuteContractRequest(
-    action: App2AppAction.EXECUTE_CONTRACT.value,
-    chainId: 8217,
-    blockChainApp: App2AppBlockChainApp(
-        name: "App2App Sample",
-        successAppLink: nil,               
-        failAppLink: nil
-    ),
-    transactions: [                        // 실행할 트랜잭션 리스트. (단, 현재는 1개의 트랜잭션만 처리.)
-        App2AppTransaction(
-            from: "0x123...456",           // 트랜잭션을 전송할 지갑 주소.
-            to: "0x654...321",             // 컨트랙트 주소.
-            abi: "{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"wad\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\",\"signature\":\"0x23b872dd\"}", // 실행할 함수의 ABI.
-            value: "0",                    // 보낼 코인 수량. (단위: peb) 단, non-payable 함수인 경우에는 0으로 지정해야 함.
-            params: "[\"0x123...456\", \"0x654...321\", 122]",     // 실행할 함수에 필요한 매개변수. JSONArray 문자열로 구성해야 함.
-            functionName: "transferFrom",   // 실행할 함수명.
-            gasLimit = "10000"             // 가스 리밋값. (Optional - 이 값을 지정해서 보낼 경우, FAVORLET 에서는 이 값으로 설정)
-        )
-    )
-)
-let response = try await self.app2AppComponent.requestExecuteContract(request)
-let requestId = response.requestId ?? ""~
 
 
 ### 실행함수 호출
@@ -253,13 +244,13 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 
 결과 데이터는 아래 예시와 같이 구성되어 반환됩니다.
 
-#### 지갑연동 (connectWallet)
+#### 지갑연결 (connectWallet)
 - requestId (String) : 요청ID.
 - expiredAt (Int) : 요청 만료시간.
 - action (String) : 액션.
 - connectWallet (App2AppReceiptResponse.ConnectWallet) : 연결된 지갑 정보.
-- - status (String) : 상태.
-- - address (String) : 연결된 지갑 주소.
+  - status (String) : 상태.
+  - address (String) : 연결된 지갑 주소.
 
 예시
 ```json
@@ -280,8 +271,8 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 - expiredAt (Int) : 요청 만료시간.
 - action (String) : 액션.
 - signMessage (App2AppReceiptResponse.SignMessage) : 메시지 서명 정보.
-- - status (String) : 상태.
-- - signature (String) : 메시지 해시값.
+  - status (String) : 상태.
+  - signature (String) : 메시지 해시값.
 
 예시
 ```json
@@ -319,8 +310,6 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 }
 ```
      
-~#### 컨트랙트함수 실행 (executeContract)~ (1.0.1 이하)
-
 #### 컨트랙트함수 실행 (executeContractWithEncoded) (1.0.2 이상)
 - requestId (String) : 요청ID.
 - expiredAt (Int) : 요청 만료시간.
@@ -354,10 +343,12 @@ let response = try await app2AppComponent.receipt(requestId: app2appRequestId)
 
 # 변경사항
 
-### 1.0.2 (23.04.13)
+### 1.1.0 (24.04.30)
+지갑연결 및 메시지 서명 (connectWalletAndSignMessage) 액션 추가
 
-#### 기존 컨트랙트함수 실행 (executeContract) 삭제
-#### 신규 컨트랙트함수 실행 (executeContractWithEncoded) 추가
+### 1.0.2 (23.04.13)
+기존 컨트랙트함수 실행 (executeContract) 삭제    
+신규 컨트랙트함수 실행 (executeContractWithEncoded) 추가
       
 
 ### 1.0.1 (23.01.20)
