@@ -10,8 +10,7 @@ import Foundation
 class App2AppApi: AlamofireManager {
     
     init() {
-//        super.init(baseUrl: "https://bridge.favorlet.link")
-        super.init(baseUrl: "https://xbsjfedu2dfxcikdzlws2yxdhu0vaufm.lambda-url.ap-northeast-2.on.aws")
+        super.init(baseUrl: "https://bridge.favorlet.link")
     }
     
     func requestConnectWallet(
