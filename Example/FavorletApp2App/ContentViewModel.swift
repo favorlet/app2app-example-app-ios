@@ -222,10 +222,6 @@ class ContentViewModel: ObservableObject {
                     case App2AppAction.SEND_COIN.rawValue:
                         resultSendCoin = response.transactions?.first?.status ?? ""
                         
-                        // MARK: 1.0.1 이하만 지원
-//                    case App2AppAction.EXECUTE_CONTRACT.rawValue:
-//                        resultExecuteContract = response.transactions?.first?.status ?? ""
-                        
                     case App2AppAction.EXECUTE_CONTRACT_WITH_ENCODED.rawValue:
                         resultExecuteContractWithEncoded = response.transactions?.first?.status ?? ""
                         
