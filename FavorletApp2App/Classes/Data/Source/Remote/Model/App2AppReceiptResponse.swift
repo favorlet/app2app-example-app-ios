@@ -13,10 +13,10 @@ public struct App2AppReceiptResponse: Decodable {
     public var action: String?
     public var chainId: Int?
     public var connectWallet: App2AppReceiptResponse.ConnectWallet?
+    public var connectWalletAndSignMessage: App2AppReceiptResponse.ConnectWalletAndSignMessage?
     public var signMessage: App2AppReceiptResponse.SignMessage?
     public var transactions: [App2AppReceiptResponse.Transaction]?
     public var error: App2AppError?
-    
     
     public struct ConnectWallet: Decodable {
         public var status: String?
@@ -24,17 +24,22 @@ public struct App2AppReceiptResponse: Decodable {
         public var errorMessage: String?
     }
     
-    
     public struct SignMessage: Decodable {
         public var status: String?
         public var signature: String?
         public var errorMessage: String?
     }
     
-    
     public struct Transaction: Decodable {
         public var status: String?
         public var txHash: String?
+        public var errorMessage: String?
+    }
+    
+    public struct ConnectWalletAndSignMessage: Decodable {
+        public var status: String?
+        public var signature: String?
+        public var address: String?
         public var errorMessage: String?
     }
 }

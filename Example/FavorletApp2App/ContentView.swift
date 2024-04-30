@@ -89,8 +89,43 @@ struct ContentView: View {
                         .font(.system(size: 15))
                         .bold()
                 }
+                .padding(EdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10))
+                .background(Color.gray.opacity(0.2))
+                
+                
+                /** 지갑연결 및 메시지 서명 (connectWalletAndSignMessage) */
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("지갑연결 및 메시지 서명\n(connectWalletAndSignMessage)")
+                        .font(.system(size: 17))
+                        .bold()
+                    Text("메시지 원본")
+                        .font(.system(size: 13))
+                    TextField("ex) favorlet", text: $message)
+                        .font(.system(size: 20))
+                        .lineLimit(1)
+                        .background(Color.white)
+                    Button(action: {
+                        UserDefaults.standard.setValue(chainId, forKey: Constant.CHAIN_ID.rawValue)
+                        UserDefaults.standard.setValue(message, forKey: Constant.MESSAGE.rawValue)
+                        
+                        contentViewModel.requestConnectWalletAndSignMessage(
+                            chainId: self.chainId,
+                            message: self.message
+                        )
+                    }) {
+                        Text("지갑연결 및 서명하기")
+                            .bold()
+                            .padding(.top, 15)
+                    }
+                    Text("결과")
+                        .font(.system(size: 13))
+                    Text(contentViewModel.signatureHash)
+                        .font(.system(size: 15))
+                        .bold()
+                }
                 .padding(10)
                 .background(Color.gray.opacity(0.2))
+                
                 
                 /** 메시지 서명 (signMessage) */
                 VStack(alignment: .leading, spacing: 10) {

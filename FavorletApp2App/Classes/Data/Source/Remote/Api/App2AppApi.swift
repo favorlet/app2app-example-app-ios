@@ -36,6 +36,29 @@ class App2AppApi: AlamofireManager {
         }
     }
     
+    func requestConnectWalletAndSignMessage(
+        request: App2AppConnectWalletAndSignMessageRequest
+    ) async throws -> App2AppConnectWalletAndSignMessageResponse {
+        try await withCheckedThrowingContinuation { continuation in
+            dump(request)
+            requestApp2AppApi(
+                url: "/request",
+                method: .post,
+                parameters: request.convertParams()
+            )
+            .responseDecodable(of: App2AppConnectWalletAndSignMessageResponse.self) { response in
+                switch response.result {
+                case .success(let data):
+                    dump(data)
+                    continuation.resume(returning: data)
+                case .failure(let error):
+                    dump(error)
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
     func requestSignMessage(
         request: App2AppSignMessageRequest
     ) async throws -> App2AppSignMessageResponse {
